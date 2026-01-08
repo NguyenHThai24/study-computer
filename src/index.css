@@ -12,6 +12,12 @@
   display: none;
 }
 
+.title {
+  font-family: 'Tagesschrift', system-ui;
+  font-weight: bold;
+  color: #b33100;
+}
+
 /* Cỏ ở đáy section */
 .section-home::after {
   content: '';

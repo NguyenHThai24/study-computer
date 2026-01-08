@@ -8,15 +8,7 @@ const Header = () => {
 
       {/* Header chính */}
       <section className="relative z-10 py-2 text-center">
-        <Link
-          to={'/'}
-          style={{
-            fontFamily: '"Tagesschrift", system-ui',
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            color: '#b33100',
-          }}
-        >
+        <Link to={'/'} className="title text-4xl">
           Study Computer
         </Link>
       </section>

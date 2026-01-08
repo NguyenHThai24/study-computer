@@ -1,627 +1,631 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-
-// Layout bàn phím full size (104 phím)
-const keyboardKeys = [
-  // Hàng 1 - Function keys
-  { id: 'esc', label: 'Esc', keyCode: 'Escape', size: 'small', row: 0 },
-  { id: 'f1', label: 'F1', keyCode: 'F1', size: 'small', row: 0 },
-  { id: 'f2', label: 'F2', keyCode: 'F2', size: 'small', row: 0 },
-  { id: 'f3', label: 'F3', keyCode: 'F3', size: 'small', row: 0 },
-  { id: 'f4', label: 'F4', keyCode: 'F4', size: 'small', row: 0 },
-  { id: 'f5', label: 'F5', keyCode: 'F5', size: 'small', row: 0 },
-  { id: 'f6', label: 'F6', keyCode: 'F6', size: 'small', row: 0 },
-  { id: 'f7', label: 'F7', keyCode: 'F7', size: 'small', row: 0 },
-  { id: 'f8', label: 'F8', keyCode: 'F8', size: 'small', row: 0 },
-  { id: 'f9', label: 'F9', keyCode: 'F9', size: 'small', row: 0 },
-  { id: 'f10', label: 'F10', keyCode: 'F10', size: 'small', row: 0 },
-  { id: 'f11', label: 'F11', keyCode: 'F11', size: 'small', row: 0 },
-  { id: 'f12', label: 'F12', keyCode: 'F12', size: 'small', row: 0 },
-
-  // Hàng 2
-  { id: 'backtick', label: '` ~', keyCode: 'Backquote', row: 1 },
-  { id: '1', label: '1 !', keyCode: 'Digit1', row: 1 },
-  { id: '2', label: '2 @', keyCode: 'Digit2', row: 1 },
-  { id: '3', label: '3 #', keyCode: 'Digit3', row: 1 },
-  { id: '4', label: '4 $', keyCode: 'Digit4', row: 1 },
-  { id: '5', label: '5 %', keyCode: 'Digit5', row: 1 },
-  { id: '6', label: '6 ^', keyCode: 'Digit6', row: 1 },
-  { id: '7', label: '7 &', keyCode: 'Digit7', row: 1 },
-  { id: '8', label: '8 *', keyCode: 'Digit8', row: 1 },
-  { id: '9', label: '9 (', keyCode: 'Digit9', row: 1 },
-  { id: '0', label: '0 )', keyCode: 'Digit0', row: 1 },
-  { id: 'minus', label: '- _', keyCode: 'Minus', row: 1 },
-  { id: 'equal', label: '= +', keyCode: 'Equal', row: 1 },
-  {
-    id: 'backspace',
-    label: 'Backspace',
-    keyCode: 'Backspace',
-    size: 'large',
-    row: 1,
-  },
-
-  // Hàng 3
-  { id: 'tab', label: 'Tab', keyCode: 'Tab', size: 'medium', row: 2 },
-  { id: 'q', label: 'Q', keyCode: 'KeyQ', row: 2 },
-  { id: 'w', label: 'W', keyCode: 'KeyW', row: 2 },
-  { id: 'e', label: 'E', keyCode: 'KeyE', row: 2 },
-  { id: 'r', label: 'R', keyCode: 'KeyR', row: 2 },
-  { id: 't', label: 'T', keyCode: 'KeyT', row: 2 },
-  { id: 'y', label: 'Y', keyCode: 'KeyY', row: 2 },
-  { id: 'u', label: 'U', keyCode: 'KeyU', row: 2 },
-  { id: 'i', label: 'I', keyCode: 'KeyI', row: 2 },
-  { id: 'o', label: 'O', keyCode: 'KeyO', row: 2 },
-  { id: 'p', label: 'P', keyCode: 'KeyP', row: 2 },
-  { id: 'bracket-open', label: '[ {', keyCode: 'BracketLeft', row: 2 },
-  { id: 'bracket-close', label: '] }', keyCode: 'BracketRight', row: 2 },
-  {
-    id: 'backslash',
-    label: '\\ |',
-    keyCode: 'Backslash',
-    size: 'medium',
-    row: 2,
-  },
-
-  // Hàng 4
-  {
-    id: 'capslock',
-    label: 'Caps Lock',
-    keyCode: 'CapsLock',
-    size: 'large',
-    row: 3,
-  },
-  { id: 'a', label: 'A', keyCode: 'KeyA', row: 3 },
-  { id: 's', label: 'S', keyCode: 'KeyS', row: 3 },
-  { id: 'd', label: 'D', keyCode: 'KeyD', row: 3 },
-  { id: 'f', label: 'F', keyCode: 'KeyF', row: 3 },
-  { id: 'g', label: 'G', keyCode: 'KeyG', row: 3 },
-  { id: 'h', label: 'H', keyCode: 'KeyH', row: 3 },
-  { id: 'j', label: 'J', keyCode: 'KeyJ', row: 3 },
-  { id: 'k', label: 'K', keyCode: 'KeyK', row: 3 },
-  { id: 'l', label: 'L', keyCode: 'KeyL', row: 3 },
-  { id: 'semicolon', label: '; :', keyCode: 'Semicolon', row: 3 },
-  { id: 'quote', label: '\' "', keyCode: 'Quote', row: 3 },
-  {
-    id: 'enter',
-    label: 'Enter',
-    keyCode: 'Enter',
-    size: 'extra-large',
-    row: 3,
-  },
-
-  // Hàng 5
-  {
-    id: 'shift-left',
-    label: 'Shift',
-    keyCode: 'ShiftLeft',
-    size: 'extra-large',
-    row: 4,
-  },
-  { id: 'z', label: 'Z', keyCode: 'KeyZ', row: 4 },
-  { id: 'x', label: 'X', keyCode: 'KeyX', row: 4 },
-  { id: 'c', label: 'C', keyCode: 'KeyC', row: 4 },
-  { id: 'v', label: 'V', keyCode: 'KeyV', row: 4 },
-  { id: 'b', label: 'B', keyCode: 'KeyB', row: 4 },
-  { id: 'n', label: 'N', keyCode: 'KeyN', row: 4 },
-  { id: 'm', label: 'M', keyCode: 'KeyM', row: 4 },
-  { id: 'comma', label: ', <', keyCode: 'Comma', row: 4 },
-  { id: 'period', label: '. >', keyCode: 'Period', row: 4 },
-  { id: 'slash', label: '/ ?', keyCode: 'Slash', row: 4 },
-  {
-    id: 'shift-right',
-    label: 'Shift',
-    keyCode: 'ShiftRight',
-    size: 'extra-large',
-    row: 4,
-  },
-
-  // Hàng 6
-  {
-    id: 'ctrl-left',
-    label: 'Ctrl',
-    keyCode: 'ControlLeft',
-    size: 'medium',
-    row: 5,
-  },
-  { id: 'win-left', label: 'Win', keyCode: 'MetaLeft', size: 'medium', row: 5 },
-  { id: 'alt-left', label: 'Alt', keyCode: 'AltLeft', size: 'medium', row: 5 },
-  {
-    id: 'space',
-    label: 'Space',
-    keyCode: 'Space',
-    size: 'extra-large',
-    row: 5,
-  },
-  {
-    id: 'alt-right',
-    label: 'Alt',
-    keyCode: 'AltRight',
-    size: 'medium',
-    row: 5,
-  },
-  {
-    id: 'win-right',
-    label: 'Win',
-    keyCode: 'MetaRight',
-    size: 'medium',
-    row: 5,
-  },
-  { id: 'menu', label: 'Menu', keyCode: 'ContextMenu', size: 'medium', row: 5 },
-  {
-    id: 'ctrl-right',
-    label: 'Ctrl',
-    keyCode: 'ControlRight',
-    size: 'medium',
-    row: 5,
-  },
-];
+import { useState, useEffect, useRef } from 'react';
+import treeIMG from '../../public/images/tree.png';
 
 const TypingPage = () => {
-  // State cho game
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(7);
-  const [currentKey, setCurrentKey] = useState(null);
-  const [isGameActive, setIsGameActive] = useState(false);
-  const [message, setMessage] = useState('');
-  const [keysPressed, setKeysPressed] = useState(0);
-  const [accuracy, setAccuracy] = useState(100);
+  // Danh sách bài tập gõ (có thể thêm nhiều bài hơn)
+  const typingLessons = [
+    {
+      id: 1,
+      title: 'Bài 1: Cơ bản',
+      content:
+        'Học gõ phím là kỹ năng quan trọng trong thời đại số. Luyện tập mỗi ngày giúp bạn thành thạo hơn.',
+      difficulty: 'Dễ',
+    },
+    {
+      id: 2,
+      title: 'Bài 2: Câu dài',
+      content:
+        'Công nghệ thông tin phát triển nhanh chóng, đòi hỏi mọi người phải không ngừng học hỏi và trau dồi kiến thức mới.',
+      difficulty: 'Trung bình',
+    },
+    {
+      id: 3,
+      title: 'Bài 3: Thử thách',
+      content:
+        'Trí tuệ nhân tạo và máy học đang thay đổi cách chúng ta làm việc, giao tiếp và sáng tạo trong thế kỷ 21.',
+      difficulty: 'Khó',
+    },
+    {
+      id: 4,
+      title: 'Bài 4: Kỹ thuật số',
+      content:
+        'Chuyển đổi số không chỉ là xu hướng mà còn là yêu cầu tất yếu để phát triển trong kỷ nguyên công nghệ 4.0.',
+      difficulty: 'Trung bình',
+    },
+    {
+      id: 5,
+      title: 'Bài 5: Lập trình',
+      content:
+        'Ngôn ngữ lập trình giúp con người giao tiếp với máy tính, tạo ra những ứng dụng thông minh phục vụ cuộc sống.',
+      difficulty: 'Khó',
+    },
+    {
+      id: 6,
+      title: 'Bài 6: Internet',
+      content:
+        'Internet đã kết nối thế giới, biến hành tinh rộng lớn trở thành một ngôi làng toàn cầu nơi mọi người có thể tương tác.',
+      difficulty: 'Dễ',
+    },
+  ];
 
-  // Khởi tạo game
-  const startGame = useCallback(() => {
-    setIsGameActive(true);
-    setScore(0);
-    setTimeLeft(7);
-    setKeysPressed(0);
-    setAccuracy(100);
-    setMessage('');
-    selectRandomKey();
-  }, []);
+  // State
+  const [currentLesson, setCurrentLesson] = useState(typingLessons[0]);
+  const [timeLimit, setTimeLimit] = useState(180); // Mặc định 3 phút
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [stats, setStats] = useState({
+    correct: 0,
+    total: 0,
+    accuracy: 0,
+    wpm: 0,
+    score: 0, // Thêm điểm số
+  });
+  const [treeProgress, setTreeProgress] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [showLessonModal, setShowLessonModal] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [selectedLessonId, setSelectedLessonId] = useState(1);
 
-  // Chọn phím ngẫu nhiên
-  const selectRandomKey = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * keyboardKeys.length);
-    setCurrentKey(keyboardKeys[randomIndex]);
-    setTimeLeft(7);
-  }, []);
+  const inputRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  // Xử lý khi người dùng nhấn phím
-  const handleKeyPress = useCallback(
-    (event) => {
-      if (!isGameActive || !currentKey) return;
+  // Hàm tính điểm (thang điểm 10)
+  const calculateScore = (accuracy, progress, wpm) => {
+    // Công thức tính điểm:
+    // - Độ chính xác: 50%
+    // - Tiến độ: 30%
+    // - Tốc độ (WPM): 20%
+    let score = 0;
 
-      const pressedKey = event.code;
-      setKeysPressed((prev) => prev + 1);
+    if (accuracy > 0) {
+      score = accuracy * 0.5 + progress * 0.3 + Math.min(wpm / 10, 2); // WPM tối đa 20% điểm
+    }
 
-      if (pressedKey === currentKey.keyCode) {
-        // Đúng phím
-        setScore((prev) => prev + 1);
-        setMessage('✓ Đúng! +1 điểm');
+    // Chuẩn hóa về thang điểm 10
+    return Math.min(Math.round((score / 10) * 100) / 10, 10);
+  };
 
-        // Hiệu ứng visual cho phím đúng
-        const keyElement = document.getElementById(currentKey.id);
-        if (keyElement) {
-          keyElement.classList.add('correct-key');
-          setTimeout(() => {
-            keyElement.classList.remove('correct-key');
-          }, 300);
-        }
-      } else {
-        // Sai phím
-        setScore((prev) => prev - 1);
-        setMessage('✗ Sai! -1 điểm');
+  // Hàm bắt đầu game
+  const startGame = () => {
+    if (!gameStarted) {
+      setGameStarted(true);
+      setIsTyping(true);
+      setGameFinished(false);
+      setUserInput('');
+      setTimeLeft(timeLimit);
+      setStats({ correct: 0, total: 0, accuracy: 0, wpm: 0, score: 0 });
+      setTreeProgress(0);
+      startTimeRef.current = Date.now();
 
-        // Hiệu ứng visual cho phím sai (nếu tìm được phím người dùng nhấn)
-        const pressedKeyData = keyboardKeys.find(
-          (k) => k.keyCode === pressedKey,
-        );
-        if (pressedKeyData) {
-          const keyElement = document.getElementById(pressedKeyData.id);
-          if (keyElement) {
-            keyElement.classList.add('wrong-key');
-            setTimeout(() => {
-              keyElement.classList.remove('wrong-key');
-            }, 300);
-          }
-        }
+      if (inputRef.current) {
+        inputRef.current.focus();
       }
 
-      // Tính độ chính xác
-      const correctKeys = score + 1;
-      const totalKeys = keysPressed + 1;
-      const newAccuracy = Math.round((correctKeys / totalKeys) * 100);
-      setAccuracy(newAccuracy);
-
-      // Chọn phím mới
-      setTimeout(() => {
-        setMessage('');
-        selectRandomKey();
-      }, 500);
-    },
-    [currentKey, isGameActive, score, keysPressed, selectRandomKey],
-  );
-
-  // Hiệu ứng timer
-  useEffect(() => {
-    let timer;
-
-    if (isGameActive && currentKey && timeLeft > 0) {
-      timer = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            clearInterval(timer);
-            // Hết thời gian
-            setScore((prev) => prev - 1);
-            setMessage('⏰ Hết thời gian! -1 điểm');
-            setTimeout(() => {
-              setMessage('');
-              selectRandomKey();
-            }, 1000);
+            endGame();
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
     }
+  };
 
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isGameActive, currentKey, timeLeft, selectRandomKey]);
+  // Hàm kết thúc game
+  const endGame = () => {
+    clearInterval(intervalRef.current);
+    setIsTyping(false);
+    setGameStarted(false);
+    setGameFinished(true);
 
-  // Lắng nghe sự kiện bàn phím
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (!isGameActive) {
-        if (event.code === 'Space') {
-          startGame();
-        }
-        return;
+    // Tính điểm cuối cùng
+    const finalScore = calculateScore(stats.accuracy, treeProgress, stats.wpm);
+    setStats((prev) => ({
+      ...prev,
+      score: finalScore,
+    }));
+  };
+
+  // Hàm dừng game
+  const stopGame = () => {
+    clearInterval(intervalRef.current);
+    setIsTyping(false);
+    setGameStarted(false);
+    setGameFinished(true);
+
+    // Tính điểm khi dừng
+    const finalScore = calculateScore(stats.accuracy, treeProgress, stats.wpm);
+    setStats((prev) => ({
+      ...prev,
+      score: finalScore,
+    }));
+  };
+
+  // Hàm reset game
+  const resetGame = () => {
+    clearInterval(intervalRef.current);
+    setGameStarted(false);
+    setIsTyping(false);
+    setGameFinished(false);
+    setUserInput('');
+    setTimeLeft(timeLimit);
+    setStats({ correct: 0, total: 0, accuracy: 0, wpm: 0, score: 0 });
+    setTreeProgress(0);
+  };
+
+  // Hàm chọn bài và đóng modal
+  const selectLessonAndStart = () => {
+    const selectedLesson = typingLessons.find(
+      (lesson) => lesson.id === selectedLessonId,
+    );
+    setCurrentLesson(selectedLesson);
+    setShowLessonModal(false);
+    resetGame();
+  };
+
+  // Xử lý thay đổi input
+  const handleInputChange = (e) => {
+    if (!isTyping || timeLeft <= 0) return;
+
+    const newInput = e.target.value;
+    setUserInput(newInput);
+
+    let correctCount = 0;
+    for (let i = 0; i < newInput.length; i++) {
+      if (
+        i < currentLesson.content.length &&
+        newInput[i] === currentLesson.content[i]
+      ) {
+        correctCount++;
       }
-      handleKeyPress(event);
-    };
+    }
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isGameActive, handleKeyPress, startGame]);
+    const totalTyped = newInput.length;
+    const accuracy = totalTyped > 0 ? (correctCount / totalTyped) * 100 : 0;
 
-  // Chọn phím đầu tiên khi component mount
-  useEffect(() => {
-    selectRandomKey();
-  }, [selectRandomKey]);
+    const timeElapsed = (Date.now() - startTimeRef.current) / 1000 / 60;
+    const words = newInput.trim().split(/\s+/).length;
+    const wpm = timeElapsed > 0 ? Math.round(words / timeElapsed) : 0;
 
-  // Render bàn phím theo hàng
-  const renderKeyboardRows = () => {
-    const rows = [];
+    // Tính điểm tạm thời
+    const progress = (correctCount / currentLesson.content.length) * 100;
+    const currentProgress = Math.min(progress, 100);
+    const tempScore = calculateScore(accuracy, currentProgress, wpm);
 
-    for (let row = 0; row <= 5; row++) {
-      const rowKeys = keyboardKeys.filter((key) => key.row === row);
+    setStats({
+      correct: correctCount,
+      total: totalTyped,
+      accuracy: Math.round(accuracy),
+      wpm: wpm,
+      score: tempScore,
+    });
 
-      rows.push(
-        <div key={`row-${row}`} className="keyboard-row">
-          {rowKeys.map((key) => {
-            const isCurrentKey = currentKey?.id === key.id;
-            const sizeClass = key.size || 'small';
+    setTreeProgress(currentProgress);
+  };
 
-            return (
-              <motion.div
-                key={key.id}
-                id={key.id}
-                className={`key ${sizeClass} ${isCurrentKey ? 'active-key' : ''}`}
-                initial={{ scale: 1 }}
-                animate={
-                  isCurrentKey
-                    ? {
-                        scale: [1, 1.1, 1],
-                        boxShadow: [
-                          '0 0 0 0 rgba(34, 197, 94, 0)',
-                          '0 0 0 10px rgba(34, 197, 94, 0.3)',
-                          '0 0 0 0 rgba(34, 197, 94, 0)',
-                        ],
-                      }
-                    : {}
-                }
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  repeatType: 'reverse',
-                }}
-              >
-                <div className="key-label">{key.label}</div>
-                {isCurrentKey && (
-                  <div className="timer-indicator">
-                    <div
-                      className="timer-fill"
-                      style={{
-                        width: `${(timeLeft / 3) * 100}%`,
-                        backgroundColor:
-                          timeLeft <= 1
-                            ? '#ef4444'
-                            : timeLeft <= 2
-                              ? '#f59e0b'
-                              : '#22c55e',
-                      }}
-                    />
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>,
+  // So sánh từng ký tự để tô màu
+  const renderTextWithHighlights = () => {
+    const originalText = currentLesson.content;
+    const elements = [];
+
+    for (let i = 0; i < originalText.length; i++) {
+      let charClass = 'inline px-0.5 rounded';
+
+      if (i < userInput.length) {
+        if (userInput[i] === originalText[i]) {
+          charClass += ' text-green-500 bg-green-500/10';
+        } else {
+          charClass += ' text-red-500 bg-red-500/10 line-through';
+        }
+      } else if (i === userInput.length && isTyping) {
+        charClass += ' bg-white/20 border-b-2 border-blue-500';
+      }
+
+      elements.push(
+        <span key={i} className={charClass}>
+          {originalText[i]}
+        </span>,
       );
     }
 
-    return rows;
+    return elements;
   };
 
+  // Định dạng thời gian
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Vẽ cây thông với gradient dựa trên progress
+  const treeLights = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: `${treeProgress}%`,
+    background: `linear-gradient(to top, 
+      rgba(0, 200, 0, 0) 0%,
+      rgba(0, 255, 0, 0.3) ${Math.max(0, treeProgress - 70)}%,
+      rgba(0, 255, 100, 0.7) ${Math.max(0, treeProgress - 20)}%,
+      rgba(100, 255, 100, 0.9) 100%)`,
+    clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+    transition: 'height 0.5s ease',
+  };
+
+  // Cập nhật thời gian khi thay đổi setting
+  useEffect(() => {
+    if (!gameStarted) {
+      setTimeLeft(timeLimit);
+    }
+  }, [timeLimit]);
+
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-4 text-white md:p-8">
-      <div className="mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold">⌨️ Tập Gõ Bàn Phím</h1>
-          <p className="text-gray-300">
-            Gõ phím màu xanh lá trong 7 giây để ghi điểm!
-          </p>
-        </div>
-
-        {/* Game Stats */}
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
-          <motion.div
-            className="rounded-xl bg-gray-800 p-4 text-center"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div
-              className="text-3xl font-bold"
-              style={{ color: score >= 0 ? '#22c55e' : '#ef4444' }}
-            >
-              {score}
-            </div>
-            <div className="mt-1 text-sm text-gray-400">ĐIỂM SỐ</div>
-          </motion.div>
-
-          <motion.div
-            className="rounded-xl bg-gray-800 p-4 text-center"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="text-3xl font-bold text-blue-400">{timeLeft}s</div>
-            <div className="mt-1 text-sm text-gray-400">THỜI GIAN CÒN LẠI</div>
-          </motion.div>
-
-          <motion.div
-            className="rounded-xl bg-gray-800 p-4 text-center"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="text-3xl font-bold text-yellow-400">
-              {keysPressed}
-            </div>
-            <div className="mt-1 text-sm text-gray-400">SỐ LẦN GÕ</div>
-          </motion.div>
-
-          <motion.div
-            className="rounded-xl bg-gray-800 p-4 text-center"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="text-3xl font-bold text-purple-400">
-              {accuracy}%
-            </div>
-            <div className="mt-1 text-sm text-gray-400">ĐỘ CHÍNH XÁC</div>
-          </motion.div>
-        </div>
-
-        {/* Current Key Display */}
-        <AnimatePresence mode="wait">
-          {isGameActive && currentKey && (
-            <motion.div
-              key="current-key-display"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="mb-8 text-center"
-            >
-              <div className="mb-2 text-lg text-gray-300">Phím cần gõ:</div>
-              <motion.div
-                className="inline-block rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 text-4xl font-bold text-white shadow-lg"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
+    <div className="mx-auto">
+      {/* Modal chọn bài gõ */}
+      {showLessonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-2xl">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Chọn Bài Gõ</h2>
+              <button
+                onClick={() => setShowLessonModal(false)}
+                className="rounded-full p-2 text-gray-400 hover:bg-white/10 hover:text-white"
               >
-                {currentKey.label}
-              </motion.div>
-              <div className="mt-2 text-sm text-gray-400">
-                Gõ phím{' '}
-                <span className="font-mono text-green-400">
-                  {currentKey.keyCode
-                    .replace('Key', '')
-                    .replace('Digit', '')
-                    .replace('Arrow', '')}
-                </span>{' '}
-                trên bàn phím
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="mb-3 text-lg font-semibold text-gray-300">
+                Danh sách bài gõ
+              </h3>
+              <div className="grid max-h-80 grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2">
+                {typingLessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className={`cursor-pointer rounded-xl border-2 p-4 transition-all hover:scale-[1.02] ${
+                      selectedLessonId === lesson.id
+                        ? 'border-green-500 bg-green-500/20'
+                        : 'border-gray-700 bg-gray-800/50 hover:border-green-400'
+                    }`}
+                    onClick={() => setSelectedLessonId(lesson.id)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-bold text-white">{lesson.title}</h4>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs font-medium ${
+                              lesson.difficulty === 'Dễ'
+                                ? 'bg-green-500/20 text-green-400'
+                                : lesson.difficulty === 'Trung bình'
+                                  ? 'bg-yellow-500/20 text-yellow-400'
+                                  : 'bg-red-500/20 text-red-400'
+                            }`}
+                          >
+                            {lesson.difficulty}
+                          </span>
+                          <span className="text-sm text-gray-400">
+                            {lesson.content.length} ký tự
+                          </span>
+                        </div>
+                      </div>
+                      {selectedLessonId === lesson.id && (
+                        <div className="text-green-500">✓</div>
+                      )}
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-sm text-gray-300">
+                      {lesson.content}
+                    </p>
+                  </div>
+                ))}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
 
-        {/* Message Display */}
-        <AnimatePresence>
-          {message && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className={`mb-6 rounded-lg p-3 text-center text-xl font-semibold ${
-                message.includes('Đúng')
-                  ? 'bg-green-900/30 text-green-400'
-                  : message.includes('Sai')
-                    ? 'bg-red-900/30 text-red-400'
-                    : 'bg-yellow-900/30 text-yellow-400'
-              }`}
-            >
-              {message}
-            </motion.div>
-          )}
-        </AnimatePresence>
+            <div className="mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <label className="font-bold text-gray-300">Thời gian:</label>
+                <span className="text-2xl font-bold text-green-500">
+                  {formatTime(timeLimit)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="60"
+                max="3600"
+                step="30"
+                value={timeLimit}
+                onChange={(e) => setTimeLimit(+e.target.value)}
+                className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-700"
+              />
+              <div className="mt-2 flex justify-between text-sm text-gray-400">
+                <span>1 phút</span>
+                <span>60 phút</span>
+              </div>
+            </div>
 
-        {/* Game Controls */}
-        <div className="mb-8 text-center">
-          {!isGameActive ? (
-            <motion.button
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:shadow-xl"
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowLessonModal(false)}
+                className="rounded-xl bg-gray-700 px-6 py-3 font-bold text-white hover:bg-gray-600"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={selectLessonAndStart}
+                className="rounded-xl bg-gradient-to-r from-green-500 to-green-600 px-8 py-3 font-bold text-white hover:from-green-600 hover:to-green-700"
+              >
+                Bắt đầu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Kết quả sau khi hoàn thành */}
+      {gameFinished && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <div className="mb-6">
+              <div className="mb-4 inline-flex items-center justify-center rounded-full bg-green-500/20 p-3">
+                <div className="text-4xl">🏆</div>
+              </div>
+              <h2 className="text-2xl font-bold">Hoàn thành!</h2>
+              <p className="mt-2">Bạn đã hoàn thành bài tập</p>
+            </div>
+
+            <div className="mb-6 space-y-4">
+              <div className="rounded-xl bg-gray-100 p-4">
+                <div className="">Điểm số</div>
+                <div className="mt-2 text-5xl font-bold text-yellow-500">
+                  {stats.score.toFixed(1)}
+                  <span className="text-2xl text-yellow-400">/10</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl bg-gray-100 p-3">
+                  <div className="">Độ chính xác</div>
+                  <div className="text-xl font-bold text-green-500">
+                    {stats.accuracy}%
+                  </div>
+                </div>
+                <div className="rounded-xl bg-gray-100 p-3">
+                  <div className="">WPM</div>
+                  <div className="text-xl font-bold text-blue-500">
+                    {stats.wpm}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-gray-100 p-3">
+                  <div className="">Ký tự đúng</div>
+                  <div className="text-xl font-bold text-purple-500">
+                    {stats.correct}/{stats.total}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-gray-100 p-3">
+                  <div className="">Tiến độ</div>
+                  <div className="text-xl font-bold text-orange-500">
+                    {Math.round(treeProgress)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => {
+                  setGameFinished(false);
+                  resetGame();
+                }}
+                className="flex-1 rounded-xl bg-gray-700 px-6 py-3 font-bold text-white hover:bg-gray-600"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setGameFinished(false);
+                  resetGame();
+                  startGame();
+                }}
+                className="flex-1 rounded-xl bg-gradient-to-r from-green-500 to-green-600 px-6 py-3 font-bold text-white hover:from-green-600 hover:to-green-700"
+              >
+                Chơi lại
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-8 flex flex-col gap-8 lg:flex-row">
+        {/* Cây thông bên trái */}
+        <div className="flex flex-col items-center lg:w-1/3">
+          <h1 className="title text-center text-3xl drop-shadow-lg md:text-4xl">
+            Luyện Gõ Phím
+          </h1>
+
+          {/* Nút chọn bài gõ */}
+          {!gameStarted && !gameFinished && (
+            <button
+              onClick={() => setShowLessonModal(true)}
+              className="my-4 flex w-full max-w-xs items-center justify-center gap-3 rounded-full bg-green-400 py-3 font-bold text-black transition-all hover:scale-105 hover:from-blue-600 hover:to-blue-700"
             >
-              🎮 Bắt đầu chơi (Nhấn Space)
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsGameActive(false)}
-              className="rounded-xl bg-gradient-to-r from-red-500 to-pink-600 px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:shadow-xl"
-            >
-              ⏸️ Tạm dừng
-            </motion.button>
+              Chọn Bài Gõ
+            </button>
           )}
 
-          <div className="mt-4 text-sm text-gray-400">
-            <p>📌 Luật chơi: Gõ phím màu xanh lá trong 3 giây</p>
-            <p>
-              ✅ Gõ đúng: +1 điểm | ❌ Gõ sai: -1 điểm | ⏰ Hết giờ: -1 điểm
-            </p>
+          <div className="relative mb-5 h-112.5 w-100">
+            <div className="absolute inset-0">
+              <img
+                src={treeIMG}
+                alt=""
+                className="absolute bottom-0 left-1/2 w-72 -translate-x-1/2"
+              />
+            </div>
+
+            {/* Phần sáng của cây */}
+            <div className="absolute inset-0" style={treeLights}></div>
+          </div>
+
+          {/* Tiến độ */}
+          <div className="w-full max-w-xs text-center">
+            <div className="mb-2 h-3 w-full overflow-hidden rounded-full bg-gray-800">
+              <div
+                className="h-full bg-linear-to-r from-green-500 to-green-400 transition-all duration-500"
+                style={{ width: `${treeProgress}%` }}
+              ></div>
+            </div>
+            <span className="text-2xl font-bold text-green-600">
+              {Math.round(treeProgress)}%
+            </span>
+          </div>
+
+          {/* Thông báo động viên */}
+          <div className="mt-6 flex min-h-15 w-full items-center justify-center rounded-xl bg-white/40 p-4 text-center italic">
+            {treeProgress < 30 &&
+              'Cố lên! Gõ chính xác để thắp sáng cây thông!'}
+            {treeProgress >= 30 &&
+              treeProgress < 60 &&
+              'Tuyệt vời! Cây thông đang dần sáng lên!'}
+            {treeProgress >= 60 &&
+              treeProgress < 90 &&
+              'Xuất sắc! Cây thông rực sáng!'}
+            {treeProgress >= 90 && 'Hoàn hảo! Cây thông tỏa sáng rực rỡ! 🎉'}
           </div>
         </div>
 
-        {/* Keyboard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="rounded-2xl border border-gray-700 bg-gray-800/50 p-6 shadow-2xl backdrop-blur-sm"
-        >
-          <div className="keyboard-container">{renderKeyboardRows()}</div>
-        </motion.div>
+        {/* Phần luyện gõ bên phải */}
+        <div className="flex flex-col gap-6 lg:w-2/3">
+          {/* Thông tin bài đang chọn */}
+          <div className="">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h3 className="text-xl font-bold">{currentLesson.title}</h3>
+                <div className="mt-2 flex items-center gap-4">
+                  <span
+                    className={`rounded-full px-3 py-1 text-lg font-medium ${
+                      currentLesson.difficulty === 'Dễ'
+                        ? 'bg-green-500/20 text-green-900'
+                        : currentLesson.difficulty === 'Trung bình'
+                          ? 'bg-yellow-500/20 text-yellow-400'
+                          : 'bg-red-500/20 text-red-400'
+                    }`}
+                  >
+                    {currentLesson.difficulty}
+                  </span>
+                  <span className="">{currentLesson.content.length} ký tự</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                {/* Đồng hồ */}
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-blue-400 bg-white">
+                  <strong className="text-3xl font-bold text-blue-600">
+                    {formatTime(timeLeft)}
+                  </strong>
+                </div>
+
+                {/* Nút dừng khi đang chơi */}
+                {gameStarted && (
+                  <button
+                    onClick={stopGame}
+                    className="rounded-xl bg-linear-to-r from-red-500 to-red-600 px-6 py-3 font-bold text-white hover:from-red-600 hover:to-red-700"
+                  >
+                    ⏸ Dừng
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Hiển thị bài gõ */}
+          <div className="min-h-40 rounded-lg bg-white p-4 text-lg">
+            {renderTextWithHighlights()}
+          </div>
+
+          {/* Ô nhập liệu */}
+          <div className="input-area">
+            <textarea
+              ref={inputRef}
+              value={userInput}
+              onChange={handleInputChange}
+              className="w-full resize-none rounded-2xl border-2 border-green-500 bg-white/90 p-4 text-lg text-gray-900 focus:ring-2 focus:ring-green-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-white/50"
+              placeholder={
+                gameStarted ? 'Bắt đầu gõ...' : 'Chọn bài gõ và nhấn BẮT ĐẦU'
+              }
+              disabled={!gameStarted}
+              rows="3"
+            />
+          </div>
+
+          {/* Thống kê */}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+              <div className="mb-2 text-sm opacity-80">Điểm số</div>
+              <div className="text-2xl font-bold text-yellow-500">
+                {stats.score.toFixed(1)}
+                <span className="text-lg text-yellow-400">/10</span>
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+              <div className="mb-2 text-sm opacity-80">Độ chính xác</div>
+              <div className="text-2xl font-bold text-green-500">
+                {stats.accuracy}%
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+              <div className="mb-2 text-sm opacity-80">WPM</div>
+              <div className="text-2xl font-bold text-blue-500">
+                {stats.wpm}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+              <div className="mb-2 text-sm opacity-80">Ký tự đúng</div>
+              <div className="text-2xl font-bold text-purple-500">
+                {stats.correct}/{stats.total}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+              <div className="mb-2 text-sm opacity-80">Tiến độ</div>
+              <div className="text-2xl font-bold text-orange-500">
+                {Math.round(treeProgress)}%
+              </div>
+            </div>
+          </div>
+
+          {/* Nút điều khiển */}
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            {!gameStarted ? (
+              <button
+                className="flex flex-1 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:hover:scale-100"
+                onClick={startGame}
+                disabled={gameFinished}
+              >
+                BẮT ĐẦU
+              </button>
+            ) : (
+              <button
+                className="flex flex-1 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-orange-600 hover:to-orange-700"
+                onClick={resetGame}
+              >
+                CHƠI LẠI
+              </button>
+            )}
+
+            <button
+              className="flex flex-1 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-blue-600 hover:to-blue-700"
+              onClick={() => setShowLessonModal(true)}
+            >
+              CHỌN BÀI KHÁC
+            </button>
+          </div>
+        </div>
       </div>
-
-      {/* CSS Styles */}
-      <style jsx>{`
-        .keyboard-container {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          user-select: none;
-        }
-
-        .keyboard-row {
-          display: flex;
-          justify-content: center;
-          gap: 6px;
-        }
-
-        .key {
-          background: linear-gradient(145deg, #2d3748, #1a202c);
-          border-radius: 8px;
-          padding: 12px 8px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-          transition: all 0.2s;
-          position: relative;
-          overflow: hidden;
-          border: 1px solid #4a5568;
-        }
-
-        .key.small {
-          width: 60px;
-          height: 60px;
-        }
-
-        .key.medium {
-          width: 80px;
-          height: 60px;
-        }
-
-        .key.large {
-          width: 100px;
-          height: 60px;
-        }
-
-        .key.extra-large {
-          width: 120px;
-          height: 60px;
-        }
-
-        .key-label {
-          font-size: 14px;
-          font-weight: 600;
-          text-align: center;
-        }
-
-        .active-key {
-          background: linear-gradient(145deg, #22c55e, #16a34a);
-          color: white;
-          border-color: #22c55e;
-          z-index: 10;
-        }
-
-        .timer-indicator {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: rgba(0, 0, 0, 0.2);
-          border-radius: 0 0 8px 8px;
-          overflow: hidden;
-        }
-
-        .timer-fill {
-          height: 100%;
-          transition: width 1s linear;
-        }
-
-        .correct-key {
-          background: linear-gradient(145deg, #22c55e, #16a34a) !important;
-          transform: scale(0.95);
-        }
-
-        .wrong-key {
-          background: linear-gradient(145deg, #ef4444, #dc2626) !important;
-          transform: scale(0.95);
-        }
-
-        @media (max-width: 768px) {
-          .key {
-            padding: 8px 4px;
-          }
-
-          .key.small {
-            width: 40px;
-            height: 40px;
-          }
-
-          .key.medium {
-            width: 50px;
-            height: 40px;
-          }
-
-          .key.large {
-            width: 60px;
-            height: 40px;
-          }
-
-          .key.extra-large {
-            width: 70px;
-            height: 40px;
-          }
-
-          .key-label {
-            font-size: 10px;
-          }
-        }
-      `}</style>
     </div>
   );
 };
