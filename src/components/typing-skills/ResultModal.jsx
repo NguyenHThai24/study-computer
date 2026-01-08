@@ -1,13 +1,6 @@
-import { formatTime } from '../data/typingLessons';
+import { formatTime } from '../../data/typingLessons';
 
-const ResultModal = ({
-  stats,
-  timeUsed,
-  treeProgress,
-  onClose,
-  onRestart,
-  onReset,
-}) => {
+const ResultModal = ({ stats, timeUsed, treeProgress, onRestart, onReset }) => {
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">

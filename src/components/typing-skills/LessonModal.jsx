@@ -1,4 +1,4 @@
-import { formatTime } from '../data/typingLessons';
+import { formatTime } from '../../data/typingLessons';
 
 const LessonModal = ({
   typingLessons,

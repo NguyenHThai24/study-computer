@@ -64,6 +64,43 @@
   pointer-events: none;
 }
 
+/* Xe chạy từ phải sang trái */
+.car__right {
+  position: absolute;
+  bottom: -2.3rem;
+  right: -150px;
+  width: 300px;
+  height: 150px;
+  background: url('../src/assets/car.svg') no-repeat center/contain;
+
+  transform: scaleX(-1); /* lật xe */
+  animation: carMoveRight 25s linear infinite;
+}
+
+/* Đèn pha trước xe */
+.car__right::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 70%; /* bắt đầu từ đầu xe (phía trước) */
+  width: 500px;
+  height: 300px;
+
+  /* xoay ánh sáng ra phía trước xe */
+  transform: translateY(-60%) rotate(-10deg);
+
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 180, 0.7) 0%,
+    rgba(255, 255, 150, 0.3) 40%,
+    rgba(255, 255, 120, 0) 100%
+  );
+
+  clip-path: polygon(0% 48%, 100% 20%, 100% 80%, 0% 52%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
 /* ===============================
    8. ANIMATIONS
 =================================*/
@@ -73,6 +110,37 @@
   }
   100% {
     left: 100vw;
+  }
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animation chạy ngang từ phải -> trái */
+@keyframes carMoveRight {
+  0% {
+    right: -150px;
+  }
+  100% {
+    right: 100vw;
   }
 }
 

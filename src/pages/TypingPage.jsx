@@ -23,7 +23,6 @@ const TypingPage = () => {
     selectedLessonId,
     timeUsed,
     inputRef,
-    setCurrentLesson,
     setTimeLimit,
     setShowLessonModal,
     setGameFinished,
@@ -33,11 +32,11 @@ const TypingPage = () => {
     resetGame,
     selectLessonAndStart,
     handleInputChange,
-    endGame,
   } = useTypingGame(typingLessons);
 
   return (
-    <div className="">
+    <section className="section-home">
+      <div className="car__right"></div>
       <div className="mx-auto">
         {/* Modal chọn bài gõ */}
         {showLessonModal && (
@@ -72,20 +71,20 @@ const TypingPage = () => {
         )}
 
         {/* Nội dung chính */}
-        <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="flex h-full justify-center gap-8">
           {/* Khung hiển thị tiến trình bên trái */}
-          <div className="lg:w-1/3">
-            <div className="sticky top-8 overflow-hidden rounded-3xl border-4 border-blue-600 bg-gradient-to-b from-sky-400 via-blue-300 to-green-200 p-8 shadow-2xl">
-              <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
-                🎨 Bức Tranh Hoàn Thiện
+          <div className="w-1/2">
+            <div className="h-full overflow-hidden rounded-2xl border-4 border-blue-800 p-8">
+              <h2 className="title mb-6 text-center text-2xl font-bold text-gray-800">
+                Bức Tranh Hoàn Thiện
               </h2>
 
               {!gameStarted && !gameFinished && (
                 <button
                   onClick={() => setShowLessonModal(true)}
-                  className="mb-4 w-full rounded-full bg-green-600 py-3 font-bold text-white transition-all hover:scale-105 hover:bg-green-700"
+                  className="mb-4 w-full rounded-full bg-green-600 py-3 font-bold text-white transition-all hover:cursor-pointer hover:bg-green-700"
                 >
-                  📝 Chọn Bài Gõ
+                  Chọn Bài Gõ
                 </button>
               )}
 
@@ -112,8 +111,8 @@ const TypingPage = () => {
           </div>
 
           {/* Phần luyện gõ bên phải */}
-          <div className="flex flex-col gap-6 lg:w-2/3">
-            <div className="rounded-3xl border-4 border-blue-600 bg-white/90 p-6 shadow-xl">
+          <div className="flex w-1/2 flex-col gap-6">
+            <div className="rounded-2xl border-4 border-blue-800 bg-white p-6">
               <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800">
@@ -164,7 +163,7 @@ const TypingPage = () => {
               <div className="flex justify-center">
                 {!gameStarted ? (
                   <button
-                    className="w-full rounded-full bg-gradient-to-r from-green-500 to-green-600 px-12 py-4 text-xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full rounded-full bg-gradient-to-r from-green-500 to-green-600 px-12 py-4 text-xl font-bold text-white shadow-lg transition-all hover:cursor-pointer hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:hover:scale-100"
                     onClick={startGame}
                     disabled={gameFinished}
                   >
@@ -172,7 +171,7 @@ const TypingPage = () => {
                   </button>
                 ) : (
                   <button
-                    className="w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-12 py-4 text-xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:from-orange-600 hover:to-orange-700"
+                    className="w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-12 py-4 text-xl font-bold text-white shadow-lg transition-all hover:cursor-pointer hover:from-orange-600 hover:to-orange-700"
                     onClick={resetGame}
                   >
                     🔄 CHƠI LẠI
@@ -183,7 +182,7 @@ const TypingPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
