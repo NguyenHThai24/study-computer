@@ -58,7 +58,6 @@ const TypingPage = () => {
     correct: 0,
     total: 0,
     accuracy: 0,
-    wpm: 0,
     score: 0, // Thêm điểm số
   });
   const [treeProgress, setTreeProgress] = useState(0);
@@ -66,21 +65,21 @@ const TypingPage = () => {
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState(1);
+  const [timeUsed, setTimeUsed] = useState(0); // Thêm thời gian đã sử dụng
 
   const inputRef = useRef(null);
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // Hàm tính điểm (thang điểm 10)
-  const calculateScore = (accuracy, progress, wpm) => {
-    // Công thức tính điểm:
-    // - Độ chính xác: 50%
+  // Hàm tính điểm (thang điểm 10) - ĐÃ LOẠI BỎ WPM
+  const calculateScore = (accuracy, progress) => {
+    // Công thức tính điểm mới:
+    // - Độ chính xác: 70%
     // - Tiến độ: 30%
-    // - Tốc độ (WPM): 20%
     let score = 0;
 
     if (accuracy > 0) {
-      score = accuracy * 0.5 + progress * 0.3 + Math.min(wpm / 10, 2); // WPM tối đa 20% điểm
+      score = accuracy * 0.7 + progress * 0.3;
     }
 
     // Chuẩn hóa về thang điểm 10
@@ -95,7 +94,8 @@ const TypingPage = () => {
       setGameFinished(false);
       setUserInput('');
       setTimeLeft(timeLimit);
-      setStats({ correct: 0, total: 0, accuracy: 0, wpm: 0, score: 0 });
+      setTimeUsed(0); // Reset thời gian đã sử dụng
+      setStats({ correct: 0, total: 0, accuracy: 0, score: 0 });
       setTreeProgress(0);
       startTimeRef.current = Date.now();
 
@@ -111,6 +111,14 @@ const TypingPage = () => {
           }
           return prev - 1;
         });
+
+        // Cập nhật thời gian đã sử dụng
+        if (startTimeRef.current) {
+          const usedSeconds = Math.floor(
+            (Date.now() - startTimeRef.current) / 1000,
+          );
+          setTimeUsed(usedSeconds);
+        }
       }, 1000);
     }
   };
@@ -122,8 +130,16 @@ const TypingPage = () => {
     setGameStarted(false);
     setGameFinished(true);
 
+    // Cập nhật thời gian đã sử dụng cuối cùng
+    if (startTimeRef.current) {
+      const finalTimeUsed = Math.floor(
+        (Date.now() - startTimeRef.current) / 1000,
+      );
+      setTimeUsed(finalTimeUsed);
+    }
+
     // Tính điểm cuối cùng
-    const finalScore = calculateScore(stats.accuracy, treeProgress, stats.wpm);
+    const finalScore = calculateScore(stats.accuracy, treeProgress);
     setStats((prev) => ({
       ...prev,
       score: finalScore,
@@ -137,8 +153,16 @@ const TypingPage = () => {
     setGameStarted(false);
     setGameFinished(true);
 
+    // Cập nhật thời gian đã sử dụng khi dừng
+    if (startTimeRef.current) {
+      const finalTimeUsed = Math.floor(
+        (Date.now() - startTimeRef.current) / 1000,
+      );
+      setTimeUsed(finalTimeUsed);
+    }
+
     // Tính điểm khi dừng
-    const finalScore = calculateScore(stats.accuracy, treeProgress, stats.wpm);
+    const finalScore = calculateScore(stats.accuracy, treeProgress);
     setStats((prev) => ({
       ...prev,
       score: finalScore,
@@ -153,7 +177,8 @@ const TypingPage = () => {
     setGameFinished(false);
     setUserInput('');
     setTimeLeft(timeLimit);
-    setStats({ correct: 0, total: 0, accuracy: 0, wpm: 0, score: 0 });
+    setTimeUsed(0); // Reset thời gian đã sử dụng
+    setStats({ correct: 0, total: 0, accuracy: 0, score: 0 });
     setTreeProgress(0);
   };
 
@@ -167,7 +192,7 @@ const TypingPage = () => {
     resetGame();
   };
 
-  // Xử lý thay đổi input
+  // Xử lý thay đổi input - ĐÃ LOẠI BỎ TÍNH WPM
   const handleInputChange = (e) => {
     if (!isTyping || timeLeft <= 0) return;
 
@@ -187,20 +212,15 @@ const TypingPage = () => {
     const totalTyped = newInput.length;
     const accuracy = totalTyped > 0 ? (correctCount / totalTyped) * 100 : 0;
 
-    const timeElapsed = (Date.now() - startTimeRef.current) / 1000 / 60;
-    const words = newInput.trim().split(/\s+/).length;
-    const wpm = timeElapsed > 0 ? Math.round(words / timeElapsed) : 0;
-
     // Tính điểm tạm thời
     const progress = (correctCount / currentLesson.content.length) * 100;
     const currentProgress = Math.min(progress, 100);
-    const tempScore = calculateScore(accuracy, currentProgress, wpm);
+    const tempScore = calculateScore(accuracy, currentProgress);
 
     setStats({
       correct: correctCount,
       total: totalTyped,
       accuracy: Math.round(accuracy),
-      wpm: wpm,
       score: tempScore,
     });
 
@@ -391,15 +411,15 @@ const TypingPage = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-gray-100 p-3">
-                  <div className="">Độ chính xác</div>
-                  <div className="text-xl font-bold text-green-500">
-                    {stats.accuracy}%
+                  <div className="">Thời gian đã sử dụng</div>
+                  <div className="text-xl font-bold text-blue-500">
+                    {formatTime(timeUsed)}
                   </div>
                 </div>
                 <div className="rounded-xl bg-gray-100 p-3">
-                  <div className="">WPM</div>
-                  <div className="text-xl font-bold text-blue-500">
-                    {stats.wpm}
+                  <div className="">Độ chính xác</div>
+                  <div className="text-xl font-bold text-green-500">
+                    {stats.accuracy}%
                   </div>
                 </div>
                 <div className="rounded-xl bg-gray-100 p-3">
@@ -508,17 +528,19 @@ const TypingPage = () => {
                 <h3 className="text-xl font-bold">{currentLesson.title}</h3>
                 <div className="mt-2 flex items-center gap-4">
                   <span
-                    className={`rounded-full px-3 py-1 text-lg font-medium ${
+                    className={`w-40 rounded-full border bg-white py-1 text-center text-lg font-medium ${
                       currentLesson.difficulty === 'Dễ'
-                        ? 'bg-green-500/20 text-green-900'
+                        ? 'border-green-700 text-green-700'
                         : currentLesson.difficulty === 'Trung bình'
-                          ? 'bg-yellow-500/20 text-yellow-400'
-                          : 'bg-red-500/20 text-red-400'
+                          ? 'border-yellow-400 text-yellow-400'
+                          : 'border-red-500 text-red-500'
                     }`}
                   >
                     {currentLesson.difficulty}
                   </span>
-                  <span className="">{currentLesson.content.length} ký tự</span>
+                  <span className="w-40 rounded-full bg-white py-1 text-center text-lg font-medium">
+                    {currentLesson.content.length} ký tự
+                  </span>
                 </div>
               </div>
 
@@ -554,7 +576,7 @@ const TypingPage = () => {
               ref={inputRef}
               value={userInput}
               onChange={handleInputChange}
-              className="w-full resize-none rounded-2xl border-2 border-green-500 bg-white/90 p-4 text-lg text-gray-900 focus:ring-2 focus:ring-green-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-white/50"
+              className="w-full resize-none rounded-2xl border-4 border-blue-600 bg-white/90 p-4 text-lg text-gray-900 focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-white/50"
               placeholder={
                 gameStarted ? 'Bắt đầu gõ...' : 'Chọn bài gõ và nhấn BẮT ĐẦU'
               }
@@ -563,34 +585,28 @@ const TypingPage = () => {
             />
           </div>
 
-          {/* Thống kê */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+          {/* Thống kê - ĐÃ LOẠI BỎ WPM */}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="rounded-2xl border-4 border-blue-600 bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
               <div className="mb-2 text-sm opacity-80">Điểm số</div>
               <div className="text-2xl font-bold text-yellow-500">
                 {stats.score.toFixed(1)}
                 <span className="text-lg text-yellow-400">/10</span>
               </div>
             </div>
-            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+            <div className="rounded-2xl border-4 border-blue-600 bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
               <div className="mb-2 text-sm opacity-80">Độ chính xác</div>
               <div className="text-2xl font-bold text-green-500">
                 {stats.accuracy}%
               </div>
             </div>
-            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
-              <div className="mb-2 text-sm opacity-80">WPM</div>
-              <div className="text-2xl font-bold text-blue-500">
-                {stats.wpm}
-              </div>
-            </div>
-            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+            <div className="rounded-2xl border-4 border-blue-600 bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
               <div className="mb-2 text-sm opacity-80">Ký tự đúng</div>
               <div className="text-2xl font-bold text-purple-500">
                 {stats.correct}/{stats.total}
               </div>
             </div>
-            <div className="rounded-2xl bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
+            <div className="rounded-2xl border-4 border-blue-600 bg-white/10 p-4 text-center transition-transform hover:scale-[1.02] hover:bg-white/15">
               <div className="mb-2 text-sm opacity-80">Tiến độ</div>
               <div className="text-2xl font-bold text-orange-500">
                 {Math.round(treeProgress)}%
@@ -602,7 +618,7 @@ const TypingPage = () => {
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             {!gameStarted ? (
               <button
-                className="flex flex-1 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-green-500 to-green-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:hover:scale-100"
+                className="flex flex-1 items-center justify-center gap-3 rounded-full bg-linear-to-r from-green-500 to-green-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:hover:scale-100"
                 onClick={startGame}
                 disabled={gameFinished}
               >
@@ -616,13 +632,6 @@ const TypingPage = () => {
                 CHƠI LẠI
               </button>
             )}
-
-            <button
-              className="flex flex-1 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-3 text-lg font-bold text-white transition-all hover:scale-105 hover:from-blue-600 hover:to-blue-700"
-              onClick={() => setShowLessonModal(true)}
-            >
-              CHỌN BÀI KHÁC
-            </button>
           </div>
         </div>
       </div>

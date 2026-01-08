@@ -4,7 +4,7 @@ import { FaTrophy, FaStar, FaRedo, FaTimes } from 'react-icons/fa';
 const GameOverModal = ({ score, onRestart, onExit }) => {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80">
-      <div className="w-full max-w-md rounded-2xl border-2 border-white/20 bg-white p-8 backdrop-blur-md">
+      <div className="w-full max-w-md rounded-2xl border-2 border-white/20 bg-white p-8">
         <h2 className="mb-4 text-center text-4xl font-bold text-red-500">
           HẾT GIỜ!
         </h2>
