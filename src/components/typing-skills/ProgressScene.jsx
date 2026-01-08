@@ -1,7 +1,7 @@
 const ProgressScene = ({ treeProgress }) => {
   return (
-    <div className="relative mx-auto h-[400px] w-full overflow-hidden rounded-2xl border-4 border-amber-800 bg-gradient-to-b from-sky-300 via-sky-200 to-green-300">
-      <div className="absolute right-0 bottom-0 left-0 h-16 bg-gradient-to-t from-green-700 to-green-500"></div>
+    <div className="relative mx-auto h-[80%] w-full overflow-hidden rounded-2xl border-4 border-amber-800 bg-gradient-to-b from-sky-300 via-sky-200 to-green-300">
+      <div className="absolute right-0 bottom-0 left-0 h-14 bg-linear-to-t from-green-700 to-green-500"></div>
 
       {/* 10%: Cây thông xuất hiện */}
       {treeProgress >= 10 && (
@@ -13,9 +13,9 @@ const ProgressScene = ({ treeProgress }) => {
           }}
         >
           <div className="relative flex flex-col items-center">
-            <div className="h-0 w-0 border-r-[60px] border-b-[100px] border-l-[60px] border-r-transparent border-b-green-600 border-l-transparent"></div>
-            <div className="-mt-12 h-0 w-0 border-r-[50px] border-b-[80px] border-l-[50px] border-r-transparent border-b-green-500 border-l-transparent"></div>
-            <div className="-mt-10 h-0 w-0 border-r-[40px] border-b-[60px] border-l-[40px] border-r-transparent border-b-green-400 border-l-transparent"></div>
+            <div className="h-0 w-0 border-r-60 border-b-100 border-l-60 border-r-transparent border-b-green-600 border-l-transparent"></div>
+            <div className="-mt-12 h-0 w-0 border-r-50 border-b-80 border-l-50 border-r-transparent border-b-green-500 border-l-transparent"></div>
+            <div className="-mt-10 h-0 w-0 border-r-40 border-b-60 border-l-40 border-r-transparent border-b-green-400 border-l-transparent"></div>
             <div className="-mt-2 h-16 w-8 bg-amber-800"></div>
           </div>
         </div>

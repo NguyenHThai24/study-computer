@@ -75,38 +75,39 @@ const TypingPage = () => {
           {/* Khung hiển thị tiến trình bên trái */}
           <div className="w-1/2">
             <div className="h-full overflow-hidden rounded-2xl border-4 border-blue-800 p-8">
-              <h2 className="title mb-6 text-center text-2xl font-bold text-gray-800">
+              <h2 className="title text-center text-2xl font-bold text-gray-800">
                 Bức Tranh Hoàn Thiện
               </h2>
+              <div className="my-4 flex w-full gap-4">
+                {!gameStarted && !gameFinished && (
+                  <button
+                    onClick={() => setShowLessonModal(true)}
+                    className="w-full rounded-full bg-green-600 py-3 font-bold text-white transition-all hover:cursor-pointer hover:bg-green-700"
+                  >
+                    Chọn Bài Gõ
+                  </button>
+                )}
 
-              {!gameStarted && !gameFinished && (
-                <button
-                  onClick={() => setShowLessonModal(true)}
-                  className="mb-4 w-full rounded-full bg-green-600 py-3 font-bold text-white transition-all hover:cursor-pointer hover:bg-green-700"
-                >
-                  Chọn Bài Gõ
-                </button>
-              )}
+                <div className="w-full rounded-full border-4 border-blue-600 bg-linear-to-r from-purple-500/30 to-pink-500/30 p-4 text-center text-sm leading-relaxed font-medium text-gray-800">
+                  {treeProgress < 10 && 'Bắt đầu gõ để tạo nên bức tranh! ✨'}
+                  {treeProgress >= 10 &&
+                    treeProgress < 40 &&
+                    'Cây thông đã xuất hiện! Tiếp tục nào! 🌲'}
+                  {treeProgress >= 40 &&
+                    treeProgress < 60 &&
+                    'Mây đã xuất hiện! Tuyệt vời! ☁️'}
+                  {treeProgress >= 60 &&
+                    treeProgress < 80 &&
+                    'Chim đang bay! Xuất sắc! 🐦'}
+                  {treeProgress >= 80 &&
+                    treeProgress < 100 &&
+                    'Thỏ đã xuất hiện! Gần xong rồi! 🐰'}
+                  {treeProgress >= 100 &&
+                    'Hoàn hảo! Bức tranh hoàn chỉnh! 🎉☀️🌸'}
+                </div>
+              </div>
 
               <ProgressScene treeProgress={treeProgress} />
-
-              <div className="mt-4 rounded-2xl border-4 border-blue-600 bg-gradient-to-r from-purple-500/30 to-pink-500/30 p-4 text-center text-sm leading-relaxed font-medium text-gray-800">
-                {treeProgress < 10 && 'Bắt đầu gõ để tạo nên bức tranh! ✨'}
-                {treeProgress >= 10 &&
-                  treeProgress < 40 &&
-                  'Cây thông đã xuất hiện! Tiếp tục nào! 🌲'}
-                {treeProgress >= 40 &&
-                  treeProgress < 60 &&
-                  'Mây đã xuất hiện! Tuyệt vời! ☁️'}
-                {treeProgress >= 60 &&
-                  treeProgress < 80 &&
-                  'Chim đang bay! Xuất sắc! 🐦'}
-                {treeProgress >= 80 &&
-                  treeProgress < 100 &&
-                  'Thỏ đã xuất hiện! Gần xong rồi! 🐰'}
-                {treeProgress >= 100 &&
-                  'Hoàn hảo! Bức tranh hoàn chỉnh! 🎉☀️🌸'}
-              </div>
             </div>
           </div>
 
