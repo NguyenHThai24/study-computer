@@ -186,31 +186,23 @@ const TypingPage = () => {
   const renderRandomCoverage = () => {
     return (
       <>
-        {/* Hình ảnh đen trắng (lớp dưới) */}
-        <div className="absolute inset-0">
-          <img
-            src={currentLesson.image}
-            alt={currentLesson.title}
-            className="h-full w-full object-cover"
-            style={{ filter: 'grayscale(100%)' }}
-          />
-        </div>
+        {/* Lớp nền đen thui */}
+        <div className="absolute inset-0 bg-black" />
 
-        {/* Lớp màu với mask ngẫu nhiên */}
+        {/* Lớp ảnh màu với mask */}
         <div className="absolute inset-0">
           <img
             src={currentLesson.image}
             alt={currentLesson.title}
             className="h-full w-full object-cover"
             style={{
-              filter: 'none',
               WebkitMaskImage: `linear-gradient(to right, black ${coverage}%, transparent ${coverage}%)`,
               maskImage: `linear-gradient(to right, black ${coverage}%, transparent ${coverage}%)`,
             }}
           />
         </div>
 
-        {/* Thông tin phần trăm che phủ */}
+        {/* Hiển thị % */}
         <div className="absolute right-4 bottom-4 rounded-full bg-black/70 px-4 py-2 text-sm font-bold text-white">
           {Math.round(coverage)}% hình ảnh màu
         </div>
