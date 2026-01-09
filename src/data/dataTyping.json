@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "5 Điều Bác Hồ Dạy",
+    "description": "Bài học về 5 điều Bác Hồ dạy thiếu niên nhi đồng",
+    "level": "Lớp 2",
+    "content": "Yêu Tổ quốc, yêu đồng bào.\nHọc tập tốt, lao động tốt.\nĐoàn kết tốt, kỷ luật tốt.\nGiữ gìn vệ sinh thật tốt.\nKhiêm tốn, thật thà, dũng cảm.",
+    "image": "/images/1.jpg"
+  },
+  {
+    "id": 2,
+    "title": "Quê Hương",
+    "description": "Bài tập đọc về tình yêu quê hương",
+    "level": "Lớp 3",
+    "content": "Quê hương là chùm khế ngọt\nCho con trèo hái mỗi ngày\nQuê hương là đường đi học\nCon về rợp bướm vàng bay.",
+    "image": "/images/que-huong.jpg"
+  },
+  {
+    "id": 3,
+    "title": "Mùa Thu Của Em",
+    "description": "Bài thơ về mùa thu cho học sinh lớp 1",
+    "level": "Lớp 1",
+    "content": "Lá vàng rơi xào xạc\nTrời thu trong xanh ngắt\nÔng trăng tròn sáng tỏ\nSoi sáng khắp sân nhà.",
+    "image": "/images/mua-thu.jpg"
+  },
+  {
+    "id": 4,
+    "title": "Cây Bàng",
+    "description": "Miêu tả cây bàng bốn mùa",
+    "level": "Lớp 4",
+    "content": "Mùa đông, cây vươn dài những cành khẳng khiu, trụi lá.\nXuân sang, cành trên cành dưới chi chít những lộc non mơn mởn.\nHè về, những tán lá xanh um che mát một khoảng sân trường.\nThu đến, từng chiếc lá bàng lớn dần, chuyển màu đỏ sẫm.",
+    "image": "/images/cay-bang.jpg"
+  },
+  {
+    "id": 5,
+    "title": "Bác Hồ Kính Yêu",
+    "description": "Bài học về Bác Hồ",
+    "level": "Lớp 2",
+    "content": "Bác Hồ là vị lãnh tụ vĩ đại của dân tộc Việt Nam.\nBác đã hy sinh cả cuộc đời vì nước, vì dân.\nTình yêu thương của Bác dành cho thiếu nhi thật bao la.\nChúng em luôn nhớ ơn và học tập theo năm điều Bác dạy.",
+    "image": "/images/bac-ho-thieu-nhi.jpg"
+  }
+]
